@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>家庭儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: none; 
+            background-color: #F8FAFC;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            will-change: height;
+            transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1); /* 增加一點彈性感 */
+        }
+
+        #nav-indicator {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .sub-item {
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+        }
+
+        #toast {
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s;
+            transform: translate(-50%, 100px);
+            opacity: 0;
+        }
+        #toast.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+
+        /* 頂部主導覽按鈕懸浮效果 */
+        .nav-btn:active {
+            transform: scale(0.9);
+        }
+    </style>
+</head>
+<body class="text-slate-900 overflow-x-hidden selection:bg-blue-100">
+
+    <!-- 頂部導覽列 -->
+    <header id="main-header" class="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-slate-100 overflow-hidden h-[85px]">
+        
+        <!-- 拖曳感應熱區 -->
+        <div id="drag-zone" class="absolute inset-0 z-30 cursor-grab active:cursor-grabbing"></div>
+
+        <!-- 主導覽按鈕區 (z-40 確保永遠可點擊) -->
+        <div id="top-nav" class="h-[85px] px-4 flex items-center justify-between relative z-40 pointer-events-none">
+            <div class="flex space-x-1 flex-1 justify-around pointer-events-auto">
+                <button onclick="handleMainTabClick('overview')" class="nav-btn relative py-2 px-3 flex flex-col items-center justify-center group" data-id="overview" data-hex="#3b82f6">
+                    <i data-lucide="layout-dashboard" class="mb-1 w-5 h-5 transition-transform text-blue-500"></i>
+                    <span class="text-[10px] font-black tracking-tighter text-slate-900">概覽</span>
+                </button>
+                <button onclick="handleMainTabClick('calendar')" class="nav-btn relative py-2 px-3 flex flex-col items-center justify-center group" data-id="calendar" data-hex="#a855f7">
+                    <i data-lucide="calendar" class="mb-1 w-5 h-5 transition-transform text-slate-300"></i>
+                    <span class="text-[10px] font-black tracking-tighter opacity-40 text-slate-300">行程</span>
+                </button>
+                <button onclick="handleMainTabClick('chores')" class="nav-btn relative py-2 px-3 flex flex-col items-center justify-center group" data-id="chores" data-hex="#22c55e">
+                    <i data-lucide="check-square" class="mb-1 w-5 h-5 transition-transform text-slate-300"></i>
+                    <span class="text-[10px] font-black tracking-tighter opacity-40 text-slate-300">家事</span>
+                </button>
+                <button onclick="handleMainTabClick('shopping')" class="nav-btn relative py-2 px-3 flex flex-col items-center justify-center group" data-id="shopping" data-hex="#f97316">
+                    <i data-lucide="shopping-bag" class="mb-1 w-5 h-5 transition-transform text-slate-300"></i>
+                    <span class="text-[10px] font-black tracking-tighter opacity-40 text-slate-300">購物</span>
+                </button>
+                
+                <div id="nav-indicator" class="absolute -bottom-1 h-1.5 rounded-full bg-blue-500 w-8"></div>
+            </div>
+        </div>
+
+        <!-- 下拉子選單內容 (4欄1列) -->
+        <div id="expanded-content" class="px-5 pt-3 pb-8 opacity-0 transition-opacity duration-300 relative z-40 pointer-events-none">
+            <div class="flex flex-col items-center">
+                <!-- 視覺把手 -->
+                <div class="w-10 h-1 bg-slate-100 rounded-full mb-6"></div>
+                
+                <!-- 子選單按鈕容器 -->
+                <div id="sub-menu-grid" class="grid grid-cols-4 gap-3 w-full pointer-events-auto">
+                    <!-- 由 JS 動態生成 16 個內容中的 4 個 -->
+                </div>
+                
+                <p id="status-label" class="mt-8 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                    下拉展開子選單 • 點擊執行功能
+                </p>
+            </div>
+        </div>
+
+        <!-- 底部裝飾提示 -->
+        <div class="absolute bottom-1 w-full flex justify-center z-10 pointer-events-none">
+            <div class="w-8 h-1 bg-slate-100 rounded-full"></div>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main id="main-content" class="mt-[85px] p-6 pb-24 transition-transform duration-500 ease-in-out">
+        <!-- 概覽看板 -->
+        <div id="view-overview" class="tab-content active space-y-6">
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-[2.5rem] text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="bg-white/20 px-4 py-1.5 rounded-full text-[10px] font-bold tracking-wider">SMART HOME</span>
+                        <i data-lucide="wifi" class="w-4 h-4"></i>
+                    </div>
+                    <h2 id="live-time" class="text-5xl font-black tracking-tighter">15:20</h2>
+                    <p class="text-blue-100 font-bold mt-2">家庭設備運作良好</p>
+                </div>
+                <div class="absolute -bottom-10 -right-10 w-48 h-48 bg-white/10 blur-[60px] rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <div class="w-10 h-10 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center mb-4 shadow-sm">
+                        <i data-lucide="thermometer"></i>
+                    </div>
+                    <p class="font-black text-xs text-slate-400 uppercase">客廳溫度</p>
+                    <p class="text-2xl font-black text-slate-800">24.2°C</p>
+                </div>
+                <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center mb-4 shadow-sm">
+                        <i data-lucide="droplets"></i>
+                    </div>
+                    <p class="font-black text-xs text-slate-400 uppercase">當前濕度</p>
+                    <p class="text-2xl font-black text-slate-800">58%</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="view-calendar" class="tab-content space-y-4">
+            <h3 class="text-2xl font-black px-2 tracking-tight">近期行程</h3>
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-100">
+                <p class="text-slate-400 font-bold">今日尚無待辦事項</p>
+            </div>
+        </div>
+        <div id="view-chores" class="tab-content space-y-4">
+            <h3 class="text-2xl font-black px-2 tracking-tight">家事分配</h3>
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-100">
+                <p class="text-slate-400 font-bold">所有家事已分配完畢</p>
+            </div>
+        </div>
+        <div id="view-shopping" class="tab-content space-y-4">
+            <h3 class="text-2xl font-black px-2 tracking-tight">購物清單</h3>
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-100">
+                <p class="text-slate-400 font-bold">清單中尚有 3 個項目</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 訊息提示 -->
+    <div id="toast" class="fixed bottom-24 left-1/2 bg-slate-900/95 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-2xl z-[60] flex items-center space-x-3 pointer-events-none">
+        <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+        <span id="toast-msg" class="text-xs font-bold">指令已發送</span>
+    </div>
+
+    <!-- 快速操作按鈕 -->
+    <button class="fixed bottom-8 right-8 w-16 h-16 rounded-full flex items-center justify-center text-white shadow-2xl z-40 bg-blue-600 active:scale-90 transition-all">
+        <i data-lucide="plus" class="w-8 h-8"></i>
+    </button>
+
+    <script>
+        lucide.createIcons();
+
+        let activeTabId = 'overview';
+        let isMenuOpen = false;
+        let dragStartY = 0;
+        let currentDragDiff = 0;
+        let isDragging = false;
+        
+        const NORMAL_HEIGHT = 85;
+        const EXPANDED_HEIGHT = 225; 
+        const SNAP_THRESHOLD = 50; // 下拉超過此距離則「固定」不收回
+
+        const menuData = {
+            overview: {
+                label: '概覽', color: 'bg-blue-500', hex: '#3b82f6',
+                subs: [
+                    { label: '客廳燈', icon: 'lightbulb' },
+                    { label: '溫控', icon: 'thermometer' },
+                    { label: '插座', icon: 'zap' },
+                    { label: '保全', icon: 'shield-check' }
+                ]
+            },
+            calendar: {
+                label: '行程', color: 'bg-purple-500', hex: '#a855f7',
+                subs: [
+                    { label: '教育', icon: 'graduation-cap' },
+                    { label: '聚餐', icon: 'utensils' },
+                    { label: '運動', icon: 'dumbbell' },
+                    { label: '醫療', icon: 'stethoscope' }
+                ]
+            },
+            chores: {
+                label: '家事', color: 'bg-green-500', hex: '#22c55e',
+                subs: [
+                    { label: '吸塵', icon: 'fan' },
+                    { label: '澆水', icon: 'droplets' },
+                    { label: '洗滌', icon: 'waves' },
+                    { label: '垃圾', icon: 'trash-2' }
+                ]
+            },
+            shopping: {
+                label: '購物', color: 'bg-orange-500', hex: '#f97316',
+                subs: [
+                    { label: '生鮮', icon: 'shopping-cart' },
+                    { label: '雜貨', icon: 'package' },
+                    { label: '五金', icon: 'hammer' },
+                    { label: '寵物', icon: 'heart' }
+                ]
+            }
+        };
+
+        const header = document.getElementById('main-header');
+        const dragZone = document.getElementById('drag-zone');
+        const expandedContent = document.getElementById('expanded-content');
+        const subMenuGrid = document.getElementById('sub-menu-grid');
+        const indicator = document.getElementById('nav-indicator');
+        const mainContent = document.getElementById('main-content');
+        const statusLabel = document.getElementById('status-label');
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // 點擊子功能按鈕：執行動作並收回選單
+        function handleSubAction(label) {
+            showToast(`執行功能：${label}`);
+            // 執行後自動收回
+            toggleMenu(false);
+        }
+
+        function renderSubMenu(id) {
+            const data = menuData[id];
+            subMenuGrid.innerHTML = data.subs.map(sub => `
+                <button onclick="handleSubAction('${sub.label}')" class="sub-item group flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-50 border border-slate-100 active:bg-white active:shadow-md transition-all">
+                    <div class="w-10 h-10 rounded-xl ${data.color} flex items-center justify-center text-white mb-2 shadow-sm transition-transform group-active:scale-90">
+                        <i data-lucide="${sub.icon}" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-[9px] font-black text-slate-500">${sub.label}</span>
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function setActiveTab(id) {
+            activeTabId = id;
+            document.querySelectorAll('.tab-content').forEach(v => v.classList.remove('active'));
+            const targetView = document.getElementById(`view-${id}`);
+            if (targetView) targetView.classList.add('active');
+            
+            // 更新水平按鈕狀態
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const icon = btn.querySelector('svg') || btn.querySelector('i');
+                const text = btn.querySelector('span');
+                const isMatch = btn.dataset.id === id;
+                if (icon) icon.style.color = isMatch ? btn.dataset.hex : '#CBD5E1';
+                if (text) {
+                    text.classList.toggle('text-slate-900', isMatch);
+                    text.classList.toggle('text-slate-300', !isMatch);
+                    text.classList.toggle('opacity-40', !isMatch);
+                }
+            });
+
+            // 更新底線
+            const activeBtn = document.querySelector(`[data-id="${id}"]`);
+            const item = menuData[id];
+            if (activeBtn) {
+                indicator.style.left = `${activeBtn.offsetLeft + (activeBtn.offsetWidth / 2) - 16}px`;
+                indicator.className = `absolute -bottom-1 h-1.5 rounded-full ${item.color} w-8`;
+            }
+            
+            renderSubMenu(id);
+        }
+
+        // 核心切換功能 (具有 transition)
+        function toggleMenu(open) {
+            isMenuOpen = open;
+            header.style.transition = 'height 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
+            header.style.height = open ? `${EXPANDED_HEIGHT}px` : `${NORMAL_HEIGHT}px`;
+            expandedContent.style.opacity = open ? '1' : '0';
+            mainContent.style.transform = open ? `translateY(${EXPANDED_HEIGHT - NORMAL_HEIGHT}px)` : 'translateY(0)';
+            
+            // 重要：控制點擊穿透與手勢
+            expandedContent.style.pointerEvents = open ? 'auto' : 'none';
+            // 展開時，拖曳層依然在背景，但主要由 subMenuGrid 處理點擊
+            statusLabel.innerText = open ? "向上滑動或點擊按鈕以收起" : "下拉以切換家庭看板";
+        }
+
+        // 點擊主分頁按鈕：切換分頁並收回選單
+        function handleMainTabClick(id) {
+            setActiveTab(id);
+            if (isMenuOpen) toggleMenu(false);
+        }
+
+        // 下拉與上滑手勢邏輯
+        function onStart(y) {
+            dragStartY = y;
+            isDragging = true;
+            header.style.transition = 'none'; // 拖曳時手動控制，關閉過渡
+        }
+
+        function onMove(y) {
+            if (!isDragging) return;
+            const diff = y - dragStartY;
+            currentDragDiff = diff;
+            
+            let newHeight;
+            if (!isMenuOpen) {
+                // 從頂部下拉
+                newHeight = NORMAL_HEIGHT + Math.max(0, diff);
+            } else {
+                // 從展開狀態上滑或下拉
+                newHeight = EXPANDED_HEIGHT + diff;
+            }
+
+            // 限制高度範圍
+            const finalHeight = Math.min(Math.max(NORMAL_HEIGHT, newHeight), EXPANDED_HEIGHT + 30);
+            header.style.height = `${finalHeight}px`;
+            
+            // 透明度隨動
+            const progress = (finalHeight - NORMAL_HEIGHT) / (EXPANDED_HEIGHT - NORMAL_HEIGHT);
+            expandedContent.style.opacity = Math.max(0, Math.min(1, progress));
+        }
+
+        function onEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            if (!isMenuOpen) {
+                // 尚未開啟：下拉超過閾值則「滯留固定」
+                if (currentDragDiff > SNAP_THRESHOLD) {
+                    toggleMenu(true);
+                } else {
+                    toggleMenu(false);
+                }
+            } else {
+                // 已開啟：向上滑動超過閾值則收起
+                if (currentDragDiff < -SNAP_THRESHOLD) {
+                    toggleMenu(false);
+                } else {
+                    toggleMenu(true);
+                }
+            }
+            currentDragDiff = 0;
+        }
+
+        // 事件綁定
+        dragZone.addEventListener('mousedown', e => onStart(e.clientY));
+        window.addEventListener('mousemove', e => onMove(e.clientY));
+        window.addEventListener('mouseup', onEnd);
+
+        dragZone.addEventListener('touchstart', e => onStart(e.touches[0].clientY), {passive: true});
+        window.addEventListener('touchmove', e => onMove(e.touches[0].clientY), {passive: true});
+        window.addEventListener('touchend', onEnd);
+
+        // 點擊內容區收回
+        mainContent.addEventListener('click', () => {
+            if (isMenuOpen) toggleMenu(false);
+        });
+
+        // 更新時間
+        setInterval(() => {
+            const now = new Date();
+            const h = now.getHours().toString().padStart(2, '0');
+            const m = now.getMinutes().toString().padStart(2, '0');
+            const el = document.getElementById('live-time');
+            if (el) el.innerText = `${h}:${m}`;
+        }, 1000);
+
+        window.onload = () => {
+            setTimeout(() => setActiveTab('overview'), 50);
+        };
+    </script>
+</body>
+</html>
