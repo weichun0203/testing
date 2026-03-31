@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>停車場車位管理系統 - HTML 版</title>
+    <!-- 使用 Tailwind CSS 進行快速樣式開發 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 使用 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+        .spot-width { width: 120px; }
+        .spot-min-height { min-height: 110px; }
+        /* 強制設定字體為 16px */
+        .content-font-size { font-size: 16px !important; }
+    </style>
+
+    <script>
+        // 將邏輯函數定義在 head 中，確保 Alpine.js 初始化前函數已存在
+        function parkingApp() {
+            const INITIAL_LAYOUT = {
+                'zhongzheng_left': [
+                    { id: 'CZ2', label: '中正2', car: 'ACR7172', color: 'bg-orange-400' },
+                    { id: 'CZ4', label: '中正4', car: 'ACN7656', color: 'bg-orange-400' },
+                    { id: 'CZ6', label: '中正6', car: 'ACN7638', color: 'bg-orange-400' },
+                    { id: 'CZ8', label: '中正8', car: 'VSP31366', color: 'bg-orange-400' },
+                    { id: 'CZ10', label: '中正10', car: 'BTU274808', color: 'bg-orange-400' },
+                    { id: 'EXT1', label: '', car: 'VSR06356', color: 'bg-slate-100' },
+                    { id: 'EXT2', label: '', car: 'ACR7210', color: 'bg-slate-100', note: '4/1 行車' },
+                    { id: 'EXT3', label: '', car: 'ACR7167', color: 'bg-slate-100', note: '4/1 行車' },
+                    { id: 'EXT4', label: '', car: 'BVU278608', color: 'bg-slate-100' },
+                ],
+                'zhongzheng_mid': [
+                    { id: 'CZ1', label: '中正1', car: '', color: 'bg-orange-400' },
+                    { id: 'CZ3', label: '中正3', car: '', color: 'bg-orange-400' },
+                    { id: 'CZ5', label: '中正5', car: '', color: 'bg-orange-400' },
+                    { id: 'CZ7', label: '中正7', car: '', color: 'bg-orange-400' },
+                    { id: 'CZ9', label: '中正9', car: '', color: 'bg-orange-400' },
+                ],
+                'main_gate': [
+                    { id: 'G3', label: '正門3', car: 'BTX8599', color: 'bg-orange-400' },
+                    { id: 'G2', label: '正門2', car: '8735UX', color: 'bg-orange-400' },
+                    { id: 'G1', label: '正門1', car: 'BPX5008', color: 'bg-orange-400' },
+                ],
+                'fuzhe_lane': [
+                    { id: 'FZL1', label: 'F1', car: '', color: 'bg-orange-400' },
+                    { id: 'FZL2', label: 'F2', car: '', color: 'bg-orange-400' },
+                    { id: 'FZL3', label: 'F3', car: '', color: 'bg-orange-400' },
+                    { id: 'FZL4', label: 'F4', car: '', color: 'bg-orange-400' },
+                    { id: 'FZL5', label: 'F5', car: '', color: 'bg-orange-400' },
+                    { id: 'FZL6', label: 'F6', car: '', color: 'bg-orange-400' },
+                ],
+                'fuzhe_main': [
+                    { id: 'FZ1', label: '富1', car: '', color: 'bg-orange-400' },
+                    { id: 'FZ2', label: '富2', car: '', color: 'bg-orange-400' },
+                    { id: 'FZ3', label: '富3', car: '', color: 'bg-orange-400' },
+                    { id: 'FZ4', label: '富4', car: '', color: 'bg-orange-400' },
+                    { id: 'FZ5', label: '富5', car: '', color: 'bg-orange-400' },
+                    { id: 'FZ6', label: '富6', car: '', color: 'bg-orange-400' },
+                ],
+                'zone_a': [
+                    { id: 'A1', label: 'A1', car: '', color: 'bg-orange-400' },
+                    { id: 'A2', label: 'A2', car: 'TX8067', color: 'bg-orange-400', spotColor: 'bg-green-300' },
+                    { id: 'A3', label: 'A3', car: 'X6527', color: 'bg-orange-400', spotColor: 'bg-green-300' },
+                    { id: 'A4', label: 'A4', car: 'S90616', color: 'bg-orange-400' },
+                    { id: 'A5', label: 'A5', car: '', color: 'bg-orange-400' },
+                    { id: 'A6', label: 'A6', car: 'APX2039', color: 'bg-orange-400' },
+                    { id: 'A7', label: 'A7', car: 'TX1012', color: 'bg-orange-400' },
+                    { id: 'A8', label: 'A8', car: 'VS0454', color: 'bg-orange-400' },
+                    { id: 'A9', label: 'A9', car: '', color: 'bg-orange-400' },
+                    { id: 'A10', label: 'A10', car: 'BOSS', color: 'bg-orange-400', spotColor: 'bg-sky-400' },
+                ],
+                'zone_b': [
+                    { id: 'B1', label: 'B1', car: '公務', color: 'bg-orange-400', spotColor: 'bg-yellow-300' },
+                    { id: 'B2', label: 'B2', car: '3601', color: 'bg-orange-400', spotColor: 'bg-yellow-300' },
+                    { id: 'B3', label: 'B3', car: '公務', color: 'bg-orange-400', spotColor: 'bg-yellow-300' },
+                    { id: 'B4', label: 'B4', car: '公務', color: 'bg-orange-400', spotColor: 'bg-yellow-300' },
+                ]
+            };
+
+            return {
+                data: JSON.parse(JSON.stringify(INITIAL_LAYOUT)),
+                searchTerm: '',
+                activeTab: 'zhongzheng',
+                message: '點選車位管理',
+                selectedSpot: null,
+                isModalOpen: false,
+                modalMode: 'add',
+                editTarget: null,
+                formPlate: '',
+                formNote: '',
+                tabs: [
+                    { id: 'zhongzheng', label: '中正區', icon: 'map-pin' },
+                    { id: 'fuzhe', label: '富喆區', icon: 'map-pin' },
+                    { id: 'zone_ab', label: 'A/B區', icon: 'map-pin' }
+                ],
+
+                init() {
+                    lucide.createIcons();
+                },
+
+                getCurrentSections() {
+                    if (this.activeTab === 'zhongzheng') return ['zhongzheng_left', 'zhongzheng_mid'];
+                    if (this.activeTab === 'fuzhe') return ['main_gate', 'fuzhe_lane', 'fuzhe_main'];
+                    if (this.activeTab === 'zone_ab') return ['zone_a', 'zone_b'];
+                    return [];
+                },
+
+                isSelected(section, index) {
+                    return this.selectedSpot && this.selectedSpot.section === section && this.selectedSpot.index === index;
+                },
+
+                isMatch(car) {
+                    return car && this.searchTerm && car.toLowerCase().includes(this.searchTerm.toLowerCase());
+                },
+
+                handleSpotClick(section, index) {
+                    const clickedItem = this.data[section][index];
+                    
+                    if (this.selectedSpot) {
+                        if (this.selectedSpot.section === section && this.selectedSpot.index === index) {
+                            this.selectedSpot = null;
+                            this.openEditModal(section, index);
+                            return;
+                        }
+
+                        const sourceItem = this.data[this.selectedSpot.section][this.selectedSpot.index];
+                        const targetItem = this.data[section][index];
+
+                        const tempCar = targetItem.car;
+                        const tempNote = targetItem.note;
+                        const tempSpotColor = targetItem.spotColor;
+
+                        targetItem.car = sourceItem.car;
+                        targetItem.note = sourceItem.note;
+                        targetItem.spotColor = sourceItem.spotColor;
+
+                        sourceItem.car = tempCar;
+                        sourceItem.note = tempNote;
+                        sourceItem.spotColor = tempSpotColor;
+
+                        this.message = '已移動車輛';
+                        this.selectedSpot = null;
+                    } else {
+                        if (clickedItem.car) {
+                            this.selectedSpot = { section, index };
+                            this.message = `選中 ${clickedItem.car}`;
+                        } else {
+                            this.openAddModal(section, index);
+                        }
+                    }
+                },
+
+                openAddModal(section, index) {
+                    this.modalMode = 'add';
+                    this.editTarget = { section, index };
+                    this.formPlate = '';
+                    this.formNote = '';
+                    this.isModalOpen = true;
+                    this.focusInput();
+                },
+
+                openEditModal(section, index) {
+                    const item = this.data[section][index];
+                    this.modalMode = 'edit';
+                    this.editTarget = { section, index };
+                    this.formPlate = item.car;
+                    this.formNote = item.note || '';
+                    this.isModalOpen = true;
+                    this.focusInput();
+                },
+
+                saveForm() {
+                    const { section, index } = this.editTarget;
+                    this.data[section][index].car = this.formPlate;
+                    this.data[section][index].note = this.formNote;
+                    this.isModalOpen = false;
+                    this.message = '儲存成功';
+                },
+
+                deleteCar() {
+                    const { section, index } = this.editTarget;
+                    this.data[section][index].car = '';
+                    this.data[section][index].note = '';
+                    this.isModalOpen = false;
+                    this.message = '車位已清空';
+                },
+
+                resetData() {
+                    this.data = JSON.parse(JSON.stringify(INITIAL_LAYOUT));
+                    this.message = '資料已重置';
+                },
+
+                focusInput() {
+                    setTimeout(() => {
+                        const input = document.querySelector('input[x-model="formPlate"]');
+                        if (input) input.focus();
+                    }, 50);
+                }
+            }
+        }
+    </script>
+    <!-- 使用 Alpine.js 處理響應式邏輯 -->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-slate-200 font-sans text-slate-800 antialiased overflow-hidden" x-data="parkingApp()" x-init="init()">
+
+    <div class="h-screen flex flex-col">
+        <!-- 頂部導航欄 -->
+        <header class="bg-white border-b border-slate-300 z-30 shadow-md">
+            <div class="max-w-5xl mx-auto px-3 py-2 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-1 shrink-0">
+                    <i data-lucide="layout-grid" class="text-blue-600 w-4 h-4"></i>
+                    <h1 class="text-[14px] font-black uppercase tracking-tighter">PARK.V3</h1>
+                </div>
+                
+                <!-- 搜尋欄 -->
+                <div class="relative flex-grow max-w-[300px]">
+                    <i data-lucide="search" class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 w-3.5 h-3.5"></i>
+                    <input 
+                        type="text" 
+                        placeholder="搜尋車牌..." 
+                        x-model="searchTerm"
+                        class="pl-7 pr-2 py-1.5 border border-slate-300 rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 w-full text-xs outline-none"
+                    >
+                </div>
+                
+                <button @click="resetData" class="p-2 text-slate-400 hover:text-blue-600 transition-colors">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- 分區切換頁籤 -->
+            <div class="max-w-5xl mx-auto flex">
+                <template x-for="tab in tabs" :key="tab.id">
+                    <button
+                        @click="activeTab = tab.id; selectedSpot = null"
+                        class="flex-1 flex flex-col items-center justify-center py-2 text-[11px] font-bold transition-all border-b-2"
+                        :class="activeTab === tab.id ? 'border-blue-600 text-blue-700 bg-blue-50' : 'border-transparent text-slate-400'"
+                    >
+                        <i :data-lucide="tab.icon" class="mb-0.5 w-4 h-4"></i>
+                        <span x-text="tab.label"></span>
+                    </button>
+                </template>
+            </div>
+        </header>
+
+        <!-- 狀態提示訊息 -->
+        <div class="bg-slate-900 text-white text-[10px] text-center py-1.5 font-bold uppercase tracking-widest shadow-inner" x-text="message"></div>
+
+        <!-- 主內容區 -->
+        <main class="flex-grow w-full max-w-5xl mx-auto p-4 overflow-y-auto">
+            <div class="flex flex-wrap gap-3 justify-start">
+                
+                <!-- 渲染對應區域的車位 -->
+                <template x-for="(sectionKey, idx) in getCurrentSections()" :key="sectionKey">
+                    <div class="contents">
+                        <template x-for="(item, index) in data[sectionKey]" :key="item.id">
+                            <div 
+                                @click="handleSpotClick(sectionKey, index)"
+                                class="flex flex-col border border-slate-400 spot-width spot-min-height cursor-pointer transition-all relative overflow-hidden bg-white"
+                                :class="{
+                                    'ring-2 ring-blue-600 z-20 shadow-lg': isSelected(sectionKey, index),
+                                    'ring-2 ring-yellow-400 z-10': isMatch(item.car)
+                                }"
+                            >
+                                <!-- 頂部標籤 -->
+                                <div class="text-black font-bold text-[10px] py-0.5 text-center border-b border-slate-400 shrink-0 select-none" 
+                                     :class="item.color" x-text="item.label || '-'"></div>
+                                
+                                <!-- 車位內容區 -->
+                                <div class="flex-grow flex flex-col items-center justify-center p-1 relative"
+                                     :class="item.car ? (item.spotColor || 'bg-pink-100 text-slate-900') : 'bg-white hover:bg-slate-50'">
+                                    
+                                    <!-- 車牌號碼 (16px) -->
+                                    <div class="text-center w-full font-black leading-tight break-words content-font-size" x-show="item.car" x-text="item.car"></div>
+                                    
+                                    <!-- 若無車輛顯示加號 -->
+                                    <div x-show="!item.car" class="opacity-20">
+                                        <i data-lucide="plus" class="w-5 h-5"></i>
+                                    </div>
+                                    
+                                    <!-- 備註內容 (16px) -->
+                                    <div x-show="item.note" class="text-center w-full font-bold text-red-600 mt-1 leading-tight break-words content-font-size" x-text="item.note"></div>
+                                    
+                                    <!-- 選中標記 -->
+                                    <div x-show="isSelected(sectionKey, index)" class="absolute top-0 right-0 bg-blue-600 text-white p-0.5">
+                                        <i data-lucide="check-circle-2" class="w-3 h-3"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <!-- 分隔線 (如果不是最後一個區塊) -->
+                        <div x-show="idx < getCurrentSections().length - 1" class="w-full h-4 border-b border-slate-300 mb-2"></div>
+                    </div>
+                </template>
+            </div>
+        </main>
+
+        <!-- 修改/新增 彈窗 -->
+        <div x-show="isModalOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" @keydown.escape.window="isModalOpen = false">
+            <div class="bg-white w-full max-w-[300px] rounded-xl shadow-2xl overflow-hidden border border-slate-400" @click.away="isModalOpen = false">
+                <div class="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                    <span class="text-sm font-black text-slate-700 uppercase" x-text="modalMode === 'add' ? '新增車輛' : '修改資訊'"></span>
+                    <button @click="isModalOpen = false" class="bg-slate-200 p-1.5 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-5 space-y-4">
+                    <div>
+                        <label class="text-[11px] font-black text-slate-400 uppercase mb-1.5 block">車牌號碼</label>
+                        <input 
+                            type="text" 
+                            x-model="formPlate"
+                            @input="formPlate = formPlate.toUpperCase()"
+                            class="w-full px-4 py-3 border-2 border-slate-200 rounded-lg text-2xl font-black focus:border-blue-500 outline-none transition-all"
+                        >
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-black text-slate-400 uppercase mb-1.5 block">備註事項</label>
+                        <textarea 
+                            x-model="formNote"
+                            class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm outline-none h-20"
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 flex gap-2">
+                    <button x-show="modalMode === 'edit'" @click="deleteCar" class="flex-1 py-3 bg-white text-red-600 rounded-lg text-xs font-black border-2 border-red-100 hover:bg-red-50">刪除</button>
+                    <button @click="saveForm" class="flex-[2] py-3 bg-blue-600 text-white rounded-lg text-xs font-black shadow-lg shadow-blue-200 hover:bg-blue-700">儲存更動</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 移動車輛提示浮窗 -->
+        <div x-show="selectedSpot" x-cloak class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 z-40 border-4 border-white animate-bounce">
+            <div class="flex flex-col">
+                <span class="text-[10px] font-bold opacity-80 uppercase">正在移動</span>
+                <!-- 修正點：在讀取 car 之前先檢查 selectedSpot 是否存在，防止 null 錯誤 -->
+                <span class="text-lg font-black leading-none" x-text="selectedSpot ? data[selectedSpot.section][selectedSpot.index].car : ''"></span>
+            </div>
+            <button @click="selectedSpot = null" class="bg-white/20 p-2 rounded-full hover:bg-white/40"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+    </div>
+</body>
+</html>
