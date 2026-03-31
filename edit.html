@@ -102,9 +102,9 @@
 
         .decoration-line {
             width: 1px;
-            height: 40px;
+            height: 24px;
             background: linear-gradient(to bottom, transparent, #8da399, transparent);
-            margin: 0 auto 1.5rem auto;
+            margin: 0 auto 1rem auto;
         }
 
         .btn-hover {
@@ -118,7 +118,7 @@
 
         .filter-btn {
             transition: all 0.3s ease;
-            white-space: nowrap; /* 確保按鈕文字不換行 */
+            white-space: nowrap;
         }
         .filter-btn.active {
             background-color: #4a4a4a;
@@ -137,19 +137,45 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* 開場動畫專用樣式 */
+        .no-scroll {
+            overflow: hidden;
+        }
+        @keyframes splashFadeIn {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .splash-text-animate {
+            animation: splashFadeIn 1s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-sage selection:text-white">
+<body class="min-h-screen flex flex-col justify-between selection:bg-sage selection:text-white no-scroll">
 
-    <header class="pt-12 md:pt-20 pb-6 px-6 text-center">
-        <h1 class="text-3xl md:text-5xl font-serif font-semibold tracking-widest text-ink mb-3 md:mb-4">
+    <!-- 開場動畫 (Splash Screen) -->
+    <div id="splash-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-paper transition-all duration-500 ease-in-out">
+        <div class="text-center splash-text-animate opacity-0 transform -translate-y-4">
+            <h1 class="text-3xl md:text-5xl font-serif font-semibold tracking-widest text-ink mb-6">
+                常溫工具箱
+            </h1>
+            <div class="w-[1px] h-12 bg-gradient-to-b from-transparent via-sage to-transparent mx-auto mb-6 opacity-60"></div>
+            <p class="text-gray-500 font-light leading-loose text-sm tracking-widest">
+                把複雜的計算交給程式，<br>
+                將時間留給生活中的美好事物。
+            </p>
+        </div>
+    </div>
+
+    <header class="pt-8 md:pt-10 pb-4 px-6 text-center">
+        <h1 class="text-2xl md:text-4xl font-serif font-semibold tracking-widest text-ink mb-2">
             常溫工具箱
         </h1>
-        <p class="text-gray-500 font-serif text-xs md:text-base tracking-widest mb-6 md:mb-8 uppercase">
+        <p class="text-gray-500 font-serif text-[10px] md:text-sm tracking-widest mb-4 uppercase">
             Ambient Toolbox
         </p>
         <div class="decoration-line"></div>
-        <p class="max-w-md mx-auto text-gray-600 font-light leading-loose text-xs md:text-sm">
+        <p class="max-w-md mx-auto text-gray-600 font-light leading-relaxed text-xs md:text-sm">
             把複雜的計算交給程式，<br>
             將時間留給生活中的美好事物。
         </p>
@@ -158,7 +184,7 @@
     <main class="flex-grow w-full max-w-6xl mx-auto px-4 md:px-6 pb-20">
         
         <!-- 搜尋與篩選列 -->
-        <div class="mb-8 md:mb-12 flex flex-col gap-4 border-b border-sand pb-4 md:pb-6">
+        <div class="mb-6 md:mb-8 flex flex-col gap-4 border-b border-sand pb-4 md:pb-6">
             
             <!-- 搜尋框 -->
             <div class="relative w-full">
@@ -209,6 +235,24 @@
     </footer>
 
     <script>
+        // ==========================================
+        // 0. 開場動畫邏輯 (Splash Screen Logic)
+        // ==========================================
+        window.addEventListener('load', () => {
+            const splash = document.getElementById('splash-screen');
+            
+            // 延遲 0.8 秒後開始淡出開場畫面
+            setTimeout(() => {
+                splash.classList.add('opacity-0', 'pointer-events-none');
+                
+                // 動畫結束後徹底移除元素，並解鎖背景滾動
+                setTimeout(() => {
+                    splash.remove();
+                    document.body.classList.remove('no-scroll');
+                }, 500); // 這裡的 500 對應 CSS 裡的 duration-500
+            }, 800);
+        });
+
         // ==========================================
         // 1. 工具列表設定 (Tools Data)
         // ==========================================
