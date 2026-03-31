@@ -299,7 +299,7 @@
             renderTools();
         });
 
-        // D. 渲染工具卡片 (APP Grid Style)
+        // D. 渲染工具卡片 (極簡文字與浮水印風格)
         function renderTools() {
             container.innerHTML = '';
             
@@ -323,29 +323,37 @@
                 filteredData.forEach(tool => {
                     const card = document.createElement('a');
                     card.href = tool.link;
-                    // 卡片主體樣式設計
+                    // 卡片主體樣式設計：增加 overflow-hidden 避免浮水印超出範圍
                     card.className = `
-                        group flex flex-col items-center justify-start bg-white p-3 md:p-5 border border-sand/50
-                        rounded-2xl md:rounded-3xl shadow-soft card-hover relative
-                        cursor-pointer animate-fade-in text-center h-full
+                        group flex flex-col items-center justify-center bg-white p-4 md:p-6 border border-sand/50
+                        rounded-2xl md:rounded-3xl shadow-soft card-hover relative overflow-hidden
+                        cursor-pointer animate-fade-in text-center min-h-[6.5rem] md:min-h-[9rem] h-full
                     `;
                     card.style.animation = "fadeIn 0.5s ease-out";
                     
                     card.innerHTML = `
-                        <!-- APP Icon 造型 -->
-                        <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-paper border border-sand/50 shadow-sm flex items-center justify-center mb-2 md:mb-4 group-hover:bg-sand/30 transition-colors duration-300">
-                            <i class="${tool.icon} text-2xl md:text-3xl ${tool.color} opacity-85 group-hover:scale-110 group-hover:opacity-100 transition-all duration-300"></i>
+                        <!-- 背景浮水大寫英文字母 (hover 時浮現) -->
+                        <div class="absolute -right-2 -bottom-4 md:-right-4 md:-bottom-6 text-7xl md:text-9xl text-sand opacity-0 group-hover:opacity-30 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 pointer-events-none select-none font-serif font-bold z-0">
+                            ${tool.tag.charAt(0)}
                         </div>
                         
-                        <!-- 標題 (限制最多兩行) -->
-                        <h2 class="text-[11px] md:text-sm font-sans md:font-serif font-medium text-ink/90 group-hover:text-sage transition-colors duration-300 line-clamp-2 leading-snug w-full px-1">
-                            ${tool.title}
-                        </h2>
-                        
-                        <!-- 說明文字 (手機版隱藏，平板/電腦版顯示) -->
-                        <p class="hidden md:block text-xs text-gray-400 mt-2 line-clamp-2 font-light leading-relaxed px-2">
-                            ${tool.desc}
-                        </p>
+                        <!-- 內容容器 -->
+                        <div class="relative z-10 w-full flex flex-col items-center">
+                            <!-- 英文分類小字 -->
+                            <div class="text-[9px] md:text-[10px] tracking-[0.2em] uppercase text-gray-400 mb-1.5 md:mb-2.5 font-sans transition-colors duration-300 group-hover:text-sage/70">
+                                ${tool.tag}
+                            </div>
+                            
+                            <!-- 標題 (限制最多兩行) -->
+                            <h2 class="text-[12px] md:text-[15px] font-sans md:font-serif font-medium text-ink/90 group-hover:text-sage transition-colors duration-300 line-clamp-2 leading-snug w-full px-1">
+                                ${tool.title}
+                            </h2>
+                            
+                            <!-- 說明文字 (手機版隱藏，平板/電腦版顯示) -->
+                            <p class="hidden md:block text-[11px] md:text-xs text-gray-400 mt-2 line-clamp-2 font-light leading-relaxed px-2">
+                                ${tool.desc}
+                            </p>
+                        </div>
                     `;
                     container.appendChild(card);
                 });
