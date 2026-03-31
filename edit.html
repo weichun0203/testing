@@ -257,28 +257,28 @@
         // 1. 工具列表設定 (Tools Data)
         // ==========================================
         const toolsData = [
-            { title: "運費成本報價", desc: "精算跨境物流開銷，掌握每一分成本與利潤。", icon: "ph-truck", tag: "Business", link: "shipping-fee-calculator.html", color: "text-stone-600" },
-            { title: "存股加薪計算", desc: "預見未來的被動收入，規劃溫柔的財富藍圖。", icon: "ph-plant", tag: "Invest", link: "dividend-investing.html", color: "text-emerald-700" },
-            { title: "薪資分配計算", desc: "或是儲蓄或是享受，找到收支的完美平衡。", icon: "ph-wallet", tag: "Invest", link: "daily-budget.html", color: "text-amber-700" },
-            { title: "複利股價計算", desc: "時間是投資最好的朋友，見證複利的力量。", icon: "ph-trend-up", tag: "Invest", link: "compound-interest.html", color: "text-blue-800" },
-            { title: "時間價值換算", desc: "每筆支出，都是一段生命的交換。", icon: "ph-clock", tag: "Invest", link: "time-value-of-money.html", color: "text-blue-800" },
-            { title: "決策矩陣分析", desc: "透過理性權重梳理，輔助感性的選擇。", icon: "ph-matrix-logo", tag: "Planning", link: "decision-matrix-analysis.html", color: "text-amber-700" },
-            { title: "曼陀羅九宮格", desc: "分析問題核心、完整思考，讓理想落地。", icon: "ph-squares-four", tag: "Planning", link: "mandala-chart.html", color: "text-amber-700" },
-            { title: "LOGO設計思考", desc: "建立基礎LOGO設計認知，開始打造品牌。", icon: "ph-pen-nib", tag: "Design", link: "logo-design.html", color: "text-amber-700" },
-            { title: "職涯探索羅盤", desc: "透過喜好與耐心，記錄你的天賦熱情。", icon: "ph-compass", tag: "Growth", link: "career-exploration.html", color: "text-amber-700" },
-            { title: "食間・菜單", desc: "解決選擇障礙，今天要吃什麼？", icon: "ph-bowl-food", tag: "Daily", link: "taiwanese-food.html", color: "text-amber-700" },
-            { title: "愛的基礎原型", desc: "愛的六色輪 - 探索情感基礎理論。", icon: "ph-heart", tag: "Growth", link: "love-style.html", color: "text-rose-700" },
-            { title: "理財金字塔", desc: "建立完整基礎的財務知識結構。", icon: "ph-pyramid", tag: "Invest", link: "money-stack.html", color: "text-amber-700" },
-            { title: "生活任務小卡", desc: "讓簡單的任務重整生活的平靜。", icon: "ph-check-square-offset", tag: "Daily", link: "daily-task.html", color: "text-teal-700" },
-            { title: "病人照護APP", desc: "醫院照顧紀錄使用", icon: "ph-bed", tag: "Product", link: "patient-care-log.html", color: "text-blue-600" },
-            { title: "時間記帳APP", desc: "覺察與分析日常的時間流", icon: "ph-hourglass", tag: "Product", link: "time-expenses.html", color: "text-indigo-600" },
-            { title: "貼心票卷產生", desc: "讓生活儀式感充滿活力", icon: "ph-ticket", tag: "Product", link: "love-coupon.html", color: "text-pink-600" },
-            { title: "任務懸賞產生", desc: "活潑的方式解決日常任務", icon: "ph-scroll", tag: "Product", link: "task-generator.html", color: "text-amber-800" },            
-            { title: "愛的六種方式", desc: "愛的實際行動與表達形式", icon: "ph-hand-heart", tag: "Growth", link: "love-language.html", color: "text-rose-600" },
-            { title: "定期定額成本", desc: "為資產穩定增值，訂下策略資產增值", icon: "ph-chart-line-up", tag: "Invest", link: "stock-analysis.html", color: "text-emerald-700" },
-            { title: "QR-code產生", desc: "即時生成 QR Code，一鍵下載無需等待。", icon: "ph-qr-code", tag: "Tool", link: "qr-code.html", color: "text-gray-700" },
-            { title: "朋友圈APP", desc: "管理你的交友圈，時時維繫重要的人", icon: "ph-users-three", tag: "Product", link: "friend-zone.html", color: "text-emerald-600" },
-            { title: "訂購單APP", desc: "建立訂購單，快速產生專業印象", icon: "ph-receipt", tag: "Product", link: "shipping-order.html", color: "text-blue-700" },
+            { title: "運費成本報價", desc: "精算跨境物流開銷，掌握每一分成本與利潤。", link: "shipping-fee-calculator.html", tag: "Business", icon: "ph-truck", color: "text-stone-600" },
+            { title: "存股加薪計算", desc: "預見未來的被動收入，規劃溫柔的財富藍圖。", link: "dividend-investing.html", tag: "Invest", icon: "ph-plant", color: "text-emerald-700" },
+            { title: "薪資分配計算", desc: "或是儲蓄或是享受，找到收支的完美平衡。", link: "daily-budget.html", tag: "Invest", icon: "ph-wallet", color: "text-amber-700" },
+            { title: "複利股價計算", desc: "時間是投資最好的朋友，見證複利的力量。", link: "compound-interest.html", tag: "Invest", icon: "ph-trend-up", color: "text-blue-800" },
+            { title: "時間價值換算", desc: "每筆支出，都是一段生命的交換。", link: "time-value-of-money.html", tag: "Invest", icon: "ph-clock", color: "text-blue-800" },
+            { title: "決策矩陣分析", desc: "透過理性權重梳理，輔助感性的選擇。", link: "decision-matrix-analysis.html", tag: "Planning", icon: "ph-matrix-logo", color: "text-amber-700" },
+            { title: "曼陀羅九宮格", desc: "分析問題核心、完整思考，讓理想落地。", link: "mandala-chart.html", tag: "Planning", icon: "ph-squares-four", color: "text-amber-700" },
+            { title: "LOGO設計思考", desc: "建立基礎LOGO設計認知，開始打造品牌。", link: "logo-design.html", tag: "Design", icon: "ph-pen-nib", color: "text-amber-700" },
+            { title: "職涯探索羅盤", desc: "透過喜好與耐心，記錄你的天賦熱情。", link: "career-exploration.html", tag: "Growth", icon: "ph-compass", color: "text-amber-700" },
+            { title: "食間・菜單", desc: "解決選擇障礙，今天要吃什麼？", link: "taiwanese-food.html", tag: "Daily", icon: "ph-bowl-food", color: "text-amber-700" },
+            { title: "愛的基礎原型", desc: "愛的六色輪 - 探索情感基礎理論。", link: "love-style.html", tag: "Growth", icon: "ph-heart", color: "text-rose-700" },
+            { title: "理財金字塔", desc: "建立完整基礎的財務知識結構。", link: "money-stack.html", tag: "Invest", icon: "ph-pyramid", color: "text-amber-700" },
+            { title: "生活任務小卡", desc: "讓簡單的任務重整生活的平靜。", link: "daily-task.html", tag: "Daily", icon: "ph-check-square-offset", color: "text-teal-700" },
+            { title: "病人照護APP", desc: "醫院照顧紀錄使用", link: "patient-care-log.html", tag: "Product", icon: "ph-bed", color: "text-blue-600" },
+            { title: "時間記帳APP", desc: "覺察與分析日常的時間流", link: "time-expenses.html", tag: "Product", icon: "ph-hourglass", color: "text-indigo-600" },
+            { title: "貼心票卷產生", desc: "讓生活儀式感充滿活力", link: "love-coupon.html", tag: "Product", icon: "ph-ticket", color: "text-pink-600" },
+            { title: "任務懸賞產生", desc: "活潑的方式解決日常任務", link: "task-generator.html", tag: "Product", icon: "ph-scroll", color: "text-amber-800" },
+            { title: "愛的六種方式", desc: "愛的實際行動與表達形式", link: "love-language.html", tag: "Growth", icon: "ph-hand-heart", color: "text-rose-600" },
+            { title: "定期定額成本", desc: "為資產穩定增值，訂下策略資產增值", link: "stock-analysis.html", tag: "Invest", icon: "ph-chart-line-up", color: "text-emerald-700" },
+            { title: "QR-code產生", desc: "即時生成 QR Code，一鍵下載無需等待。", link: "qr-code.html", tag: "Tool", icon: "ph-qr-code", color: "text-gray-700" },
+            { title: "朋友圈APP", desc: "管理你的交友圈，時時維繫重要的人", link: "friend-zone.html", tag: "Product", icon: "ph-users-three", color: "text-emerald-600" },
+            { title: "訂購單APP", desc: "建立訂購單，快速產生專業印象", link: "shipping-order.html", tag: "Product", icon: "ph-receipt", color: "text-blue-700" },
         ];
         
         // ==========================================
@@ -335,6 +335,15 @@
             }
 
             renderTools();
+
+            // 點擊篩選後，如果畫面已經往下捲動超過主內容區，則自動平滑捲動回第一列
+            const mainElement = document.querySelector('main');
+            if (mainElement && window.scrollY > mainElement.offsetTop) {
+                window.scrollTo({
+                    top: mainElement.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
         }
 
         // C. 搜尋功能監聽
